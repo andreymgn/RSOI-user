@@ -1,0 +1,141 @@
+syntax = "proto3";
+
+package user;
+
+service user {
+  rpc GetUserInfo(GetUserInfoRequest) returns (UserInfo);
+  rpc CreateUser(CreateUserRequest) returns (UserInfo);
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
+  rpc GetServiceToken(GetServiceTokenRequest) returns (GetServiceTokenResponse);
+  rpc GetAccessToken(GetTokenRequest) returns (GetAccessTokenResponse);
+  rpc GetRefreshToken(GetTokenRequest) returns (GetRefreshTokenResponse);
+  rpc RefreshAccessToken(RefreshAccessTokenRequest) returns (RefreshAccessTokenResponse);
+  rpc GetUserByAccessToken(GetUserByAccessTokenRequest) returns (GetUserByAccessTokenResponse);
+  rpc CreateApp(CreateAppRequest) returns (CreateAppResponse);
+  rpc GetAppInfo(GetAppInfoRequest) returns (GetAppInfoResponse);
+  rpc GetOAuthCode(GetOAuthCodeRequest) returns (GetOAuthCodeResponse);
+  rpc GetTokenFromCode(GetTokenFromCodeRequest) returns (GetTokenFromCodeResponse);
+}
+
+message GetUserInfoRequest {
+  string uid = 1;
+}
+
+message UserInfo {
+  string uid = 1;
+  string username = 2;
+}
+
+message CreateUserRequest {
+  string token = 1;
+  string username = 2;
+  string password = 3;
+}
+
+message UpdateUserRequest {
+  string apiToken = 1;
+  string userToken = 2;
+  string uid = 3;
+  string password = 4;
+}
+
+message UpdateUserResponse {
+
+}
+
+message DeleteUserRequest {
+  string apiToken = 1;
+  string userToken = 2;
+  string uid = 3;
+}
+
+message DeleteUserResponse {
+
+}
+
+message GetServiceTokenRequest {
+  string appId = 1;
+  string appSecret = 2;
+}
+
+message GetServiceTokenResponse {
+  string token = 1;
+}
+
+message GetTokenRequest {
+  string apiToken = 1;
+  string username = 2;
+  string password = 3;
+}
+
+message GetAccessTokenResponse {
+  string token = 1;
+  string uid = 2;
+}
+
+message GetUserByAccessTokenRequest {
+  string apiToken = 1;
+  string userToken = 2;
+}
+
+message GetUserByAccessTokenResponse {
+  string uid = 1;
+}
+
+message GetRefreshTokenResponse {
+  string token = 1;
+}
+
+message RefreshAccessTokenRequest {
+  string apiToken = 1;
+  string refreshToken = 2;
+}
+
+message RefreshAccessTokenResponse {
+  string accessToken = 1;
+  string refreshToken = 2;
+}
+
+message CreateAppRequest {
+  string apiToken = 1;
+  string owner = 2;
+  string name = 3;
+}
+
+message CreateAppResponse {
+  string id = 1;
+  string secret = 2;
+}
+
+message GetAppInfoRequest {
+  string id = 1;
+}
+
+message GetAppInfoResponse {
+  string owner = 1;
+  string name = 2;
+}
+
+message GetOAuthCodeRequest {
+  string apiToken = 1;
+  string appUid = 2;
+  string username = 3;
+  string password = 4;
+}
+
+message GetOAuthCodeResponse {
+  string code = 1;
+}
+
+message GetTokenFromCodeRequest {
+  string apiToken = 1;
+  string code = 2;
+  string appUid = 3;
+  string appSecret = 4;
+}
+
+message GetTokenFromCodeResponse {
+  string accessToken = 1;
+  string refreshToken = 2;
+}
