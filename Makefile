@@ -6,6 +6,7 @@ GOGET=$(GOCMD) get
 GOFMT=$(GOCMD) fmt
 GOTOOL=$(GOCMD) tool
 
+IMAGE := andreymgn/rsoi-user
 
 all: build
 
@@ -32,3 +33,8 @@ proto:
 build:
 	$(GOBUILD) ./cmd/...
 
+image:
+	docker build -t $(IMAGE) .
+
+push-image:
+	docker push $(IMAGE)
