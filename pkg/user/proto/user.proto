@@ -7,7 +7,6 @@ service user {
   rpc CreateUser(CreateUserRequest) returns (UserInfo);
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
-  rpc GetServiceToken(GetServiceTokenRequest) returns (GetServiceTokenResponse);
   rpc GetAccessToken(GetTokenRequest) returns (GetAccessTokenResponse);
   rpc GetRefreshToken(GetTokenRequest) returns (GetRefreshTokenResponse);
   rpc RefreshAccessToken(RefreshAccessTokenRequest) returns (RefreshAccessTokenResponse);
@@ -34,10 +33,9 @@ message CreateUserRequest {
 }
 
 message UpdateUserRequest {
-  string apiToken = 1;
-  string userToken = 2;
-  string uid = 3;
-  string password = 4;
+  string userToken = 1;
+  string uid = 2;
+  string password = 3;
 }
 
 message UpdateUserResponse {
@@ -45,28 +43,17 @@ message UpdateUserResponse {
 }
 
 message DeleteUserRequest {
-  string apiToken = 1;
-  string userToken = 2;
-  string uid = 3;
+  string userToken = 1;
+  string uid = 2;
 }
 
 message DeleteUserResponse {
 
 }
 
-message GetServiceTokenRequest {
-  string appId = 1;
-  string appSecret = 2;
-}
-
-message GetServiceTokenResponse {
-  string token = 1;
-}
-
 message GetTokenRequest {
-  string apiToken = 1;
-  string username = 2;
-  string password = 3;
+  string username = 1;
+  string password = 2;
 }
 
 message GetAccessTokenResponse {
@@ -75,8 +62,7 @@ message GetAccessTokenResponse {
 }
 
 message GetUserByAccessTokenRequest {
-  string apiToken = 1;
-  string userToken = 2;
+  string userToken = 1;
 }
 
 message GetUserByAccessTokenResponse {
@@ -88,8 +74,7 @@ message GetRefreshTokenResponse {
 }
 
 message RefreshAccessTokenRequest {
-  string apiToken = 1;
-  string refreshToken = 2;
+  string refreshToken = 1;
 }
 
 message RefreshAccessTokenResponse {
@@ -98,9 +83,8 @@ message RefreshAccessTokenResponse {
 }
 
 message CreateAppRequest {
-  string apiToken = 1;
-  string owner = 2;
-  string name = 3;
+  string owner = 1;
+  string name = 2;
 }
 
 message CreateAppResponse {
@@ -118,10 +102,9 @@ message GetAppInfoResponse {
 }
 
 message GetOAuthCodeRequest {
-  string apiToken = 1;
-  string appUid = 2;
-  string username = 3;
-  string password = 4;
+  string appUid = 1;
+  string username = 2;
+  string password = 3;
 }
 
 message GetOAuthCodeResponse {
@@ -129,10 +112,9 @@ message GetOAuthCodeResponse {
 }
 
 message GetTokenFromCodeRequest {
-  string apiToken = 1;
-  string code = 2;
-  string appUid = 3;
-  string appSecret = 4;
+  string code = 1;
+  string appUid = 2;
+  string appSecret = 3;
 }
 
 message GetTokenFromCodeResponse {

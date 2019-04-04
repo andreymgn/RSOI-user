@@ -2,12 +2,12 @@ package user
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/go-redis/redis"
 
 	pb "github.com/andreymgn/RSOI-user/pkg/user/proto"
-	"github.com/andreymgn/RSOI/services/auth"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -22,9 +22,7 @@ const (
 var (
 	statusNotFound         = status.Error(codes.NotFound, "user not found")
 	statusInvalidUUID      = status.Error(codes.InvalidArgument, "invalid UUID")
-	statusInvalidToken     = status.Error(codes.Unauthenticated, "invalid grpc token")
 	statusInvalidUserToken = status.Error(codes.Unauthenticated, "invalid user token")
-	statusInvalidCode      = status.Error(codes.Unauthenticated, "invalid code")
 )
 
 func internalError(err error) error {
@@ -59,15 +57,6 @@ func (s *Server) GetUserInfo(ctx context.Context, req *pb.GetUserInfoRequest) (*
 
 // CreateUser creates a new user
 func (s *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.UserInfo, error) {
-	valid, err := s.checkServiceToken(req.Token)
-	if err != nil {
-		return nil, err
-	}
-
-	if !valid {
-		return nil, statusInvalidToken
-	}
-
 	if len(req.Username) == 0 {
 		return nil, status.Error(codes.InvalidArgument, "username is empty")
 	}
@@ -86,15 +75,6 @@ func (s *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb
 
 // UpdateUser updates user
 func (s *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.UpdateUserResponse, error) {
-	valid, err := s.checkServiceToken(req.ApiToken)
-	if err != nil {
-		return nil, err
-	}
-
-	if !valid {
-		return nil, statusInvalidToken
-	}
-
 	uid, err := uuid.Parse(req.Uid)
 	if err != nil {
 		return nil, statusInvalidUUID
@@ -113,15 +93,6 @@ func (s *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb
 
 // DeleteUser deletes user
 func (s *Server) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) (*pb.DeleteUserResponse, error) {
-	valid, err := s.checkServiceToken(req.ApiToken)
-	if err != nil {
-		return nil, err
-	}
-
-	if !valid {
-		return nil, statusInvalidToken
-	}
-
 	uid, err := uuid.Parse(req.Uid)
 	if err != nil {
 		return nil, statusInvalidUUID
@@ -138,36 +109,10 @@ func (s *Server) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) (*pb
 	}
 }
 
-// GetServiceToken returns token for user service access
-func (s *Server) GetServiceToken(ctx context.Context, req *pb.GetServiceTokenRequest) (*pb.GetServiceTokenResponse, error) {
-	appID, appSecret := req.AppId, req.AppSecret
-	token, err := s.apiTokenAuth.Add(appID, appSecret)
-	switch err {
-	case nil:
-		res := new(pb.GetServiceTokenResponse)
-		res.Token = token
-		return res, nil
-	case auth.ErrNotFound:
-		return nil, statusNotFound
-	case auth.ErrWrongSecret:
-		return nil, status.Error(codes.Unauthenticated, "wrong secret")
-	default:
-		return nil, internalError(err)
-	}
-}
-
 // GetAccessToken returns authorization token for user
 func (s *Server) GetAccessToken(ctx context.Context, req *pb.GetTokenRequest) (*pb.GetAccessTokenResponse, error) {
-	valid, err := s.checkServiceToken(req.ApiToken)
-	if err != nil {
-		return nil, err
-	}
-
-	if !valid {
-		return nil, statusInvalidToken
-	}
-
 	uid, err := s.db.getUIDByUsername(req.Username)
+	log.Println(req)
 	if err == errNotFound {
 		return nil, statusNotFound
 	} else if err != nil {
@@ -199,15 +144,6 @@ func (s *Server) GetAccessToken(ctx context.Context, req *pb.GetTokenRequest) (*
 
 // GetUserByAccessToken checks access token existance and refreshes token expiration time
 func (s *Server) GetUserByAccessToken(ctx context.Context, req *pb.GetUserByAccessTokenRequest) (*pb.GetUserByAccessTokenResponse, error) {
-	valid, err := s.checkServiceToken(req.ApiToken)
-	if err != nil {
-		return nil, err
-	}
-
-	if !valid {
-		return nil, statusInvalidToken
-	}
-
 	token := req.UserToken
 	uid, err := s.accessTokenStorage.Get(token).Result()
 	if err == redis.Nil {
@@ -232,15 +168,6 @@ func (s *Server) GetUserByAccessToken(ctx context.Context, req *pb.GetUserByAcce
 
 // GetRefreshToken returns token which can be used to refresh access token
 func (s *Server) GetRefreshToken(ctx context.Context, req *pb.GetTokenRequest) (*pb.GetRefreshTokenResponse, error) {
-	valid, err := s.checkServiceToken(req.ApiToken)
-	if err != nil {
-		return nil, err
-	}
-
-	if !valid {
-		return nil, statusInvalidToken
-	}
-
 	uid, err := s.db.getUIDByUsername(req.Username)
 	if err == errNotFound {
 		return nil, statusNotFound
@@ -266,15 +193,6 @@ func (s *Server) GetRefreshToken(ctx context.Context, req *pb.GetTokenRequest) (
 
 // RefreshAccessToken returns new access and refresh tokens for user
 func (s *Server) RefreshAccessToken(ctx context.Context, req *pb.RefreshAccessTokenRequest) (*pb.RefreshAccessTokenResponse, error) {
-	valid, err := s.checkServiceToken(req.ApiToken)
-	if err != nil {
-		return nil, err
-	}
-
-	if !valid {
-		return nil, statusInvalidToken
-	}
-
 	token := req.RefreshToken
 	uid, err := s.refreshTokenStorage.Get(token).Result()
 	if err == redis.Nil {
@@ -312,15 +230,6 @@ func (s *Server) RefreshAccessToken(ctx context.Context, req *pb.RefreshAccessTo
 
 // CreateApp creates new third-party app
 func (s *Server) CreateApp(ctx context.Context, req *pb.CreateAppRequest) (*pb.CreateAppResponse, error) {
-	valid, err := s.checkServiceToken(req.ApiToken)
-	if err != nil {
-		return nil, err
-	}
-
-	if !valid {
-		return nil, statusInvalidToken
-	}
-
 	owner, err := uuid.Parse(req.Owner)
 	if err != nil {
 		return nil, statusInvalidUUID
@@ -361,15 +270,6 @@ func (s *Server) GetAppInfo(ctx context.Context, req *pb.GetAppInfoRequest) (*pb
 
 // GetOAuthCode returns new oauth code
 func (s *Server) GetOAuthCode(ctx context.Context, req *pb.GetOAuthCodeRequest) (*pb.GetOAuthCodeResponse, error) {
-	valid, err := s.checkServiceToken(req.ApiToken)
-	if err != nil {
-		return nil, err
-	}
-
-	if !valid {
-		return nil, statusInvalidToken
-	}
-
 	uid, err := s.db.getUIDByUsername(req.Username)
 	if err == errNotFound {
 		return nil, statusNotFound
@@ -403,15 +303,6 @@ func (s *Server) GetOAuthCode(ctx context.Context, req *pb.GetOAuthCodeRequest) 
 
 // GetTokenFromCode returns access and refresh tokens for user by oauth code
 func (s *Server) GetTokenFromCode(ctx context.Context, req *pb.GetTokenFromCodeRequest) (*pb.GetTokenFromCodeResponse, error) {
-	valid, err := s.checkServiceToken(req.ApiToken)
-	if err != nil {
-		return nil, err
-	}
-
-	if !valid {
-		return nil, statusInvalidToken
-	}
-
 	appUID, err := uuid.Parse(req.AppUid)
 	if err != nil {
 		return nil, statusInvalidUUID
@@ -422,7 +313,7 @@ func (s *Server) GetTokenFromCode(ctx context.Context, req *pb.GetTokenFromCodeR
 		return nil, statusInvalidUUID
 	}
 
-	valid, err = s.db.isValidAppCredentials(appUID, appSecret)
+	valid, err := s.db.isValidAppCredentials(appUID, appSecret)
 	if err == errNotFound {
 		return nil, statusNotFound
 	} else if err != nil {

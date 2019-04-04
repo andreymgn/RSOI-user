@@ -22,7 +22,7 @@ func main() {
 		return
 	}
 
-	fmt.Printf("running post service on port %d\n", port)
+	fmt.Printf("running user service on port %d\n", port)
 	err = runUser(port, conn, redisAddr, redisPass, redisDB)
 
 	if err != nil {

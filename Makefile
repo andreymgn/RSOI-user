@@ -30,10 +30,16 @@ proto:
 		echo compiled: $$f; \
 	done
 
-build:
+dep:
+	dep ensure --vendor-only
+
+build: fmt dep
 	$(GOBUILD) ./cmd/...
 
-image:
+build-scratch: fmt dep
+	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix nocgo -o RSOI-user ./cmd/...
+
+image: build-scratch
 	docker build -t $(IMAGE) .
 
 push-image:
