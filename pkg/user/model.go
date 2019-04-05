@@ -3,7 +3,6 @@ package user
 import (
 	"database/sql"
 	"errors"
-	"log"
 
 	"github.com/google/uuid"
 	_ "github.com/lib/pq"
@@ -163,7 +162,6 @@ func (db *db) checkPassword(uid uuid.UUID, password string) (bool, error) {
 
 func (db *db) getUIDByUsername(username string) (uuid.UUID, error) {
 	query := "SELECT uid FROM users WHERE username=$1"
-	log.Println("username=", username)
 	row := db.QueryRow(query, username)
 	var uid string
 	switch err := row.Scan(&uid); err {

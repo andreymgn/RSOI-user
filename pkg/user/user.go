@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -112,7 +111,6 @@ func (s *Server) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) (*pb
 // GetAccessToken returns authorization token for user
 func (s *Server) GetAccessToken(ctx context.Context, req *pb.GetTokenRequest) (*pb.GetAccessTokenResponse, error) {
 	uid, err := s.db.getUIDByUsername(req.Username)
-	log.Println(req)
 	if err == errNotFound {
 		return nil, statusNotFound
 	} else if err != nil {

@@ -2,12 +2,12 @@ package user
 
 import (
 	"fmt"
-	"log"
 	"net"
 
 	pb "github.com/andreymgn/RSOI-user/pkg/user/proto"
 	"github.com/go-redis/redis"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 // Server implements posts service
@@ -24,21 +24,17 @@ func NewServer(connString, redisAddr, redisPassword string, apiTokenDBNum int) (
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(redisAddr, redisPassword)
 
 	accessTokenStorage := redis.NewClient(&redis.Options{
 		Addr:     redisAddr,
 		Password: redisPassword,
 		DB:       apiTokenDBNum,
 	})
-	fmt.Println("redis_client")
-	fmt.Println(accessTokenStorage)
 
 	_, err = accessTokenStorage.Ping().Result()
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("ping")
 
 	refreshTokenStorage := redis.NewClient(&redis.Options{
 		Addr:     redisAddr,
@@ -67,11 +63,17 @@ func NewServer(connString, redisAddr, redisPassword string, apiTokenDBNum int) (
 
 // Start starts a server
 func (s *Server) Start(port int) error {
-	server := grpc.NewServer()
+	creds, err := credentials.NewServerTLSFromFile("/cert.pem", "/key.pem")
+	if err != nil {
+		return err
+	}
+
+	server := grpc.NewServer(grpc.Creds(creds))
 	pb.RegisterUserServer(server, s)
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		return err
 	}
+
 	return server.Serve(lis)
 }
