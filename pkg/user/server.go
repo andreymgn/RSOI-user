@@ -6,6 +6,8 @@ import (
 
 	pb "github.com/andreymgn/RSOI-user/pkg/user/proto"
 	"github.com/go-redis/redis"
+	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
+	opentracing "github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -62,13 +64,16 @@ func NewServer(connString, redisAddr, redisPassword string, apiTokenDBNum int) (
 }
 
 // Start starts a server
-func (s *Server) Start(port int) error {
+func (s *Server) Start(port int, tracer opentracing.Tracer) error {
 	creds, err := credentials.NewServerTLSFromFile("/cert.pem", "/key.pem")
 	if err != nil {
 		return err
 	}
 
-	server := grpc.NewServer(grpc.Creds(creds))
+	server := grpc.NewServer(
+		grpc.Creds(creds),
+		grpc.UnaryInterceptor(otgrpc.OpenTracingServerInterceptor(tracer)),
+	)
 	pb.RegisterUserServer(server, s)
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {

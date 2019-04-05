@@ -22,8 +22,10 @@ func main() {
 		return
 	}
 
+	jaegerAddr := os.Getenv("JAEGER-ADDR")
+
 	fmt.Printf("running user service on port %d\n", port)
-	err = runUser(port, conn, redisAddr, redisPass, redisDB)
+	err = runUser(port, conn, redisAddr, redisPass, redisDB, jaegerAddr)
 
 	if err != nil {
 		fmt.Printf("finished with error %v", err)
