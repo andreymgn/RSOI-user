@@ -33,6 +33,7 @@ func (u *User) UserInfo() *pb.UserInfo {
 	result := new(pb.UserInfo)
 	result.Uid = u.UID.String()
 	result.Username = u.Username
+	result.IsAdmin = u.IsAdmin
 	return result
 }
 

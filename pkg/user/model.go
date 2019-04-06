@@ -23,6 +23,7 @@ const (
 type User struct {
 	UID      uuid.UUID
 	Username string
+	IsAdmin  bool
 }
 
 // App describes third-party app
@@ -71,10 +72,10 @@ func checkPasswordHash(password, hash string) bool {
 }
 
 func (db *db) getUserInfo(uid uuid.UUID) (*User, error) {
-	query := "SELECT username FROM users WHERE uid=$1"
+	query := "SELECT username, is_admin FROM users WHERE uid=$1"
 	row := db.QueryRow(query, uid.String())
 	result := new(User)
-	switch err := row.Scan(&result.Username); err {
+	switch err := row.Scan(&result.Username, &result.IsAdmin); err {
 	case nil:
 		result.UID = uid
 		return result, nil

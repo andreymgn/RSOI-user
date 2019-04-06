@@ -24,6 +24,7 @@ message GetUserInfoRequest {
 message UserInfo {
   string uid = 1;
   string username = 2;
+  bool isAdmin = 3;
 }
 
 message CreateUserRequest {
