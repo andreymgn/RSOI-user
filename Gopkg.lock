@@ -3,11 +3,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:348635918422727cea19909556483ded5846642357e84e3e58a49c2b4caec559"
+  digest = "1:aec58b244d9c7b4e861c0497e8898af63c1605f3983a75c1a8534ab4c930906e"
   name = "github.com/andreymgn/RSOI"
-  packages = ["services/auth"]
+  packages = ["pkg/tracer"]
   pruneopts = "UT"
-  revision = "4601bf86c0a85b877be591a489180737fd8d3aa9"
+  revision = "29b692cbfb54670f7b2907cd2d37e8da85433c42"
 
 [[projects]]
   digest = "1:34a9a60fade37f8009ed4a19e02924198aba3eabfcc120ee5c6002b7de17212d"
@@ -49,6 +49,22 @@
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:d5f97fc268267ec1b61c3453058c738246fc3e746f14b1ae25161513b7367b0c"
+  name = "github.com/gorilla/mux"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "c5c6c98bc25355028a63748a498942a6398ccd22"
+  version = "v1.7.1"
+
+[[projects]]
+  branch = "master"
+  digest = "1:1a1206efd03a54d336dce7bb8719e74f2f8932f661cb9f57d5813a1d99c083d8"
+  name = "github.com/grpc-ecosystem/grpc-opentracing"
+  packages = ["go/otgrpc"]
+  pruneopts = "UT"
+  revision = "8e809c8a86450a29b90dcc9efbf062d0fe6d9746"
+
+[[projects]]
   digest = "1:8ef506fc2bb9ced9b151dafa592d4046063d744c646c1bbe801982ce87e4bc24"
   name = "github.com/lib/pq"
   packages = [
@@ -58,6 +74,68 @@
   pruneopts = "UT"
   revision = "4ded0e9383f75c197b3a2aaa6d590ac52df6fd79"
   version = "v1.0.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:bccaead3121ab7964fd80fab704f612e5893fb5a2c581d520ec847ed8cfac27e"
+  name = "github.com/opentracing-contrib/go-stdlib"
+  packages = ["nethttp"]
+  pruneopts = "UT"
+  revision = "3020fec0e66bdb65fd42cb346cb65d58deb92e0d"
+
+[[projects]]
+  digest = "1:11e62d6050198055e6cd87ed57e5d8c669e84f839c16e16f192374d913d1a70d"
+  name = "github.com/opentracing/opentracing-go"
+  packages = [
+    ".",
+    "ext",
+    "log",
+  ]
+  pruneopts = "UT"
+  revision = "659c90643e714681897ec2521c60567dd21da733"
+  version = "v1.1.0"
+
+[[projects]]
+  digest = "1:cf31692c14422fa27c83a05292eb5cbe0fb2775972e8f1f8446a71549bd8980b"
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ba968bfe8b2f7e042a574c888954fccecfa385b4"
+  version = "v0.8.1"
+
+[[projects]]
+  digest = "1:3b0ac1ac6f703e6d43f4e29c97da2c9e34465c66e2e19f9828e9841d1c9279a4"
+  name = "github.com/uber/jaeger-client-go"
+  packages = [
+    ".",
+    "config",
+    "internal/baggage",
+    "internal/baggage/remote",
+    "internal/spanlog",
+    "internal/throttler",
+    "internal/throttler/remote",
+    "log",
+    "rpcmetrics",
+    "thrift",
+    "thrift-gen/agent",
+    "thrift-gen/baggage",
+    "thrift-gen/jaeger",
+    "thrift-gen/sampling",
+    "thrift-gen/zipkincore",
+    "transport",
+    "utils",
+  ]
+  pruneopts = "UT"
+  revision = "2f47546e3facd43297739439600bcf43f44cce5d"
+  version = "v2.16.0"
+
+[[projects]]
+  digest = "1:c9d69a04f7fa171f50360bbcc32196b4de8ab8837ef772f6302d0140a1e3e7f6"
+  name = "github.com/uber/jaeger-lib"
+  packages = ["metrics"]
+  pruneopts = "UT"
+  revision = "0e30338a695636fe5bcf7301e8030ce8dd2a8530"
+  version = "v2.0.0"
 
 [[projects]]
   branch = "master"
@@ -164,15 +242,18 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/andreymgn/RSOI/services/auth",
+    "github.com/andreymgn/RSOI/pkg/tracer",
     "github.com/go-redis/redis",
     "github.com/golang/protobuf/proto",
     "github.com/google/uuid",
+    "github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc",
     "github.com/lib/pq",
+    "github.com/opentracing/opentracing-go",
     "golang.org/x/crypto/bcrypt",
     "golang.org/x/net/context",
     "google.golang.org/grpc",
     "google.golang.org/grpc/codes",
+    "google.golang.org/grpc/credentials",
     "google.golang.org/grpc/status",
   ]
   solver-name = "gps-cdcl"
