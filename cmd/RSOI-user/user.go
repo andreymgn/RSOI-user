@@ -7,10 +7,11 @@ import (
 
 func runUser(port int, connString, redisAddr, redisPassword string, redisDB int, jaegerAddr string) error {
 	tracer, closer, err := tracer.NewTracer("user", jaegerAddr)
-	defer closer.Close()
 	if err != nil {
 		return err
 	}
+
+	defer closer.Close()
 
 	server, err := user.NewServer(connString, redisAddr, redisPassword, redisDB)
 	if err != nil {
