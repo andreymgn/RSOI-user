@@ -100,6 +100,10 @@ func (db *db) create(username, password string) (*User, error) {
 	user.Username = username
 
 	result, err := db.Exec(query, user.UID.String(), username, passwordHash)
+	if err != nil {
+		return nil, err
+	}
+
 	nRows, err := result.RowsAffected()
 	if err != nil {
 		return nil, err
@@ -120,6 +124,10 @@ func (db *db) update(uid uuid.UUID, newPassword string) error {
 	}
 
 	result, err := db.Exec(query, passwordHash, uid.String())
+	if err != nil {
+		return err
+	}
+
 	nRows, err := result.RowsAffected()
 	if err != nil {
 		return err
@@ -135,6 +143,10 @@ func (db *db) update(uid uuid.UUID, newPassword string) error {
 func (db *db) delete(uid uuid.UUID) error {
 	query := "DELETE FROM users WHERE uid=$1"
 	result, err := db.Exec(query, uid.String())
+	if err != nil {
+		return err
+	}
+
 	nRows, err := result.RowsAffected()
 	if err != nil {
 		return err
@@ -181,6 +193,10 @@ func (db *db) createApp(owner uuid.UUID, name string) (*App, error) {
 	secret := uuid.New()
 
 	result, err := db.Exec(query, uid, secret, owner.String(), name)
+	if err != nil {
+		return nil, err
+	}
+
 	nRows, err := result.RowsAffected()
 	if err != nil {
 		return nil, err
