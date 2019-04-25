@@ -13,8 +13,7 @@ before_install:
   - dep ensure
 
 script:
-  - 'make test'
-  - 'make image'
+  - 'make test image'
 
 after_success:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then
