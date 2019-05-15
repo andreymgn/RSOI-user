@@ -5,14 +5,15 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 )
 
 var (
-	errNotFound           = errors.New("user not found")
-	errNotCreated         = errors.New("user not created")
-	errUserPostNotCreated = errors.New("user post not created")
+	errNotFound   = errors.New("user not found")
+	errNotCreated = errors.New("user not created")
+	errUserExists = errors.New("user with this username already exists")
 )
 
 const (
@@ -101,6 +102,11 @@ func (db *db) create(username, password string) (*User, error) {
 
 	result, err := db.Exec(query, user.UID.String(), username, passwordHash)
 	if err != nil {
+		// 23505 is a code for unique constraint violation
+		if e, ok := err.(*pq.Error); ok && e.Code == "23505" {
+			return nil, errUserExists
+		}
+
 		return nil, err
 	}
 

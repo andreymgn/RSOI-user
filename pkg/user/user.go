@@ -22,6 +22,7 @@ var (
 	statusNotFound         = status.Error(codes.NotFound, "user not found")
 	statusInvalidUUID      = status.Error(codes.InvalidArgument, "invalid UUID")
 	statusInvalidUserToken = status.Error(codes.Unauthenticated, "invalid user token")
+	statusUserExists       = status.Error(codes.AlreadyExists, "user already exists")
 )
 
 func internalError(err error) error {
@@ -66,11 +67,14 @@ func (s *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb
 	}
 
 	user, err := s.db.create(req.Username, req.Password)
-	if err != nil {
+	switch err {
+	case nil:
+		return user.UserInfo(), nil
+	case errUserExists:
+		return nil, statusUserExists
+	default:
 		return nil, internalError(err)
 	}
-
-	return user.UserInfo(), nil
 }
 
 // UpdateUser updates user
